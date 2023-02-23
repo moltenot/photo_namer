@@ -3,7 +3,7 @@ import os
 from os.path import join
 
 from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea
-from PyQt6.QtGui import QPixmap, QPainter
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
 
@@ -34,6 +34,7 @@ class PhotoNamer(QMainWindow):
         self.album_path = path
         self.file_list.update(path)
 
+
 class EditableImage(QWidget):
 
     def __init__(self, image_path):
@@ -42,7 +43,7 @@ class EditableImage(QWidget):
         self.image_path = image_path
         self.filename = os.path.basename(image_path)
         self.layout = QVBoxLayout()
-        
+
         self.image_label = QLabel(self.image_path)
         self.label_label = QLabel(self.filename)
         self.layout.addWidget(self.image_label)
@@ -53,7 +54,7 @@ class EditableImage(QWidget):
         max_size = 300
         if pixmap.width() > max_size or pixmap.height() > max_size:
             pixmap = pixmap.scaled(
-                    max_size, max_size, aspectRatioMode=aspect_ratio_mode, transformMode=Qt.TransformationMode.SmoothTransformation)
+                max_size, max_size, aspectRatioMode=aspect_ratio_mode, transformMode=Qt.TransformationMode.SmoothTransformation)
 
         if pixmap.isNull():
             raise Exception("not an image")
@@ -76,22 +77,21 @@ class FileList(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.scroll = QScrollArea()             # Scroll Area which contains the widgets, set as the centralWidget
-        self.widget = QWidget()                 # Widget that contains the collection of Vertical Box
-        self.vbox = QVBoxLayout()               # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+        self.scroll = QScrollArea() # Scroll Area which contains the widgets, set as the centralWidget
+        self.widget = QWidget() # Widget that contains the collection of Vertical Box
+        self.vbox = QVBoxLayout() # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
 
-        for i in range(1,50):
+        for i in range(1, 50):
             object = QLabel("TextLabel")
             self.vbox.addWidget(object)
 
         self.widget.setLayout(self.vbox)
 
-        #Scroll Area Properties
+        # Scroll Area Properties
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.widget)
-
 
         self.layout.addWidget(self.scroll)
         self.album_path = None
@@ -101,7 +101,6 @@ class FileList(QWidget):
         self.album_path = "/home/theo/Projects/photo_namer_tool/test_album"
         self.update(self.album_path)
         ##########
-
 
         self._update_labels()
 
@@ -115,7 +114,7 @@ class FileList(QWidget):
                     image_label = EditableImage(image_path)
                 except Exception:
                     continue
-                
+
             self.vbox.addWidget(image_label)
 
     def _clear_labels(self):
