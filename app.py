@@ -34,6 +34,34 @@ class PhotoNamer(QMainWindow):
         self.album_path = path
         self.file_list.update(path)
 
+class EditableImage(QWidget):
+
+    def __init__(self, image_path):
+        super().__init__()
+
+        self.image_path = image_path
+        self.filename = os.path.basename(image_path)
+        self.layout = QVBoxLayout()
+        
+        self.image_label = QLabel(self.image_path)
+        self.label_label = QLabel(self.filename)
+        self.layout.addWidget(self.image_label)
+        self.layout.addWidget(self.label_label)
+
+        pixmap = QPixmap(self.image_path)
+        # scale pixmap if it is too large
+        max_size = 300
+        if pixmap.width() > max_size or pixmap.height() > max_size:
+            pixmap = pixmap.scaled(
+                    max_size, max_size, aspectRatioMode=aspect_ratio_mode, transformMode=Qt.TransformationMode.SmoothTransformation)
+
+        if pixmap.isNull():
+            raise Exception("not an image")
+
+        self.image_label.setPixmap(pixmap)
+
+        self.setLayout(self.layout)
+
 
 class FileList(QWidget):
 
@@ -81,23 +109,14 @@ class FileList(QWidget):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
         for f in self.file_list:
-            label = QLabel()
-            label.setText(f)
-
             if self.album_path:
-                pixmap = QPixmap(join(self.album_path, f))
-                # scale pixmap if it is too large
-                max_size = 300
-                if pixmap.width() > max_size or pixmap.height() > max_size:
-                    pixmap = pixmap.scaled(
-                            max_size, max_size, aspectRatioMode=aspect_ratio_mode, transformMode=Qt.TransformationMode.SmoothTransformation)
-
-                if pixmap.isNull():
+                image_path = join(self.album_path, f)
+                try:
+                    image_label = EditableImage(image_path)
+                except Exception:
                     continue
-
-                label.setPixmap(pixmap)
-
-            self.vbox.addWidget(label)
+                
+            self.vbox.addWidget(image_label)
 
     def _clear_labels(self):
         while self.vbox.count():
