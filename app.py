@@ -1,7 +1,7 @@
 import sys
 import os
 
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout
 
 
 class PhotoNamer(QMainWindow):
@@ -9,7 +9,32 @@ class PhotoNamer(QMainWindow):
         super().__init__(parent=None)
         self.setWindowTitle("Photo Namer")
 
-        self.setCentralWidget(PickADir(self))
+        everything_widget = QWidget(self)
+
+        layout = QHBoxLayout()
+        layout.addWidget(PickADir(self))
+        layout.addWidget(FileList(self))
+
+        everything_widget.setLayout(layout)
+
+        self.setCentralWidget(everything_widget)
+
+class FileList(QWidget):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        file1 = QLabel(self)
+        file1.setText("file 1")
+
+        file2 = QLabel(self)
+        file2.setText("file 2")
+
+        layout = QVBoxLayout()
+        layout.addWidget(file1)
+        layout.addWidget(file2)
+
+        self.setLayout(layout)
 
 
 class PickADir(QWidget):
