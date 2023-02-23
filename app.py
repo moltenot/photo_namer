@@ -22,7 +22,7 @@ class PhotoNamer(QMainWindow):
         everything_widget.setLayout(layout)
 
         self.setCentralWidget(everything_widget)
-        self.adjustSize()
+        
 
     def set_album_path(self, path):
         print("setting album path to", path)
@@ -51,7 +51,6 @@ class FileList(QWidget):
             label.setText(f)
             self.layout().addWidget(label)
 
-
     def _clear_labels(self):
         while self.layout().count():
             child = self.layout().takeAt(0)
@@ -73,8 +72,9 @@ class PickADir(QWidget):
         self.on_pick_album_callback = on_pick_album_callback
 
         button = QPushButton("Select a Photo Album", parent=self)
+        self.setFixedWidth(250)
         button.clicked.connect(self.set_dir)
-        self.adjustSize()
+
 
     def set_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(
