@@ -2,7 +2,7 @@ import sys
 import os
 from os.path import join
 
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
@@ -45,19 +45,37 @@ class FileList(QWidget):
 
         self.file_list = ["file 1", "file 2"]
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
 
+        self.scroll = QScrollArea()             # Scroll Area which contains the widgets, set as the centralWidget
+        self.widget = QWidget()                 # Widget that contains the collection of Vertical Box
+        self.vbox = QVBoxLayout()               # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+
+        for i in range(1,50):
+            object = QLabel("TextLabel")
+            self.vbox.addWidget(object)
+
+        self.widget.setLayout(self.vbox)
+
+        #Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+
+
+        self.layout.addWidget(self.scroll)
         self.album_path = None
 
         ##########
         # todo delete
         self.album_path = "/home/theo/Projects/photo_namer_tool/test_album"
-        self.update(self.album_path)
+        # self.update(self.album_path)
         ##########
 
 
-        self._update_labels()
+        # self._update_labels()
 
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
@@ -77,9 +95,9 @@ class FileList(QWidget):
                     continue
 
                 label.setPixmap(pixmap)
-                self.layout().addWidget(label)
+                self.scroll_widget_layout.addWidget(label)
             else:
-                self.layout().addWidget(label)
+                self.scroll_widget_layout.addWidget(label)
 
     def _clear_labels(self):
         while self.layout().count():
