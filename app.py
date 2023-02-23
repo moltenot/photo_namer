@@ -1,7 +1,13 @@
 import sys
 import os
+from os.path import join
 
 from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
+
+
+aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
 
 class PhotoNamer(QMainWindow):
@@ -22,7 +28,6 @@ class PhotoNamer(QMainWindow):
         everything_widget.setLayout(layout)
 
         self.setCentralWidget(everything_widget)
-        
 
     def set_album_path(self, path):
         print("setting album path to", path)
@@ -33,6 +38,7 @@ class PhotoNamer(QMainWindow):
 class FileList(QWidget):
 
     file_list: list[str]
+    album_path: str
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -40,6 +46,8 @@ class FileList(QWidget):
         self.file_list = ["file 1", "file 2"]
         layout = QVBoxLayout()
         self.setLayout(layout)
+
+        self.album_path = None
 
         self._update_labels()
 
@@ -49,7 +57,21 @@ class FileList(QWidget):
         for f in self.file_list:
             label = QLabel(self)
             label.setText(f)
-            self.layout().addWidget(label)
+            if self.album_path:
+                pixmap = QPixmap(join(self.album_path, f))
+                # scale pixmap if it is too large
+                max_size = 300
+                if pixmap.width() > max_size or pixmap.height() > max_size:
+                    pixmap = pixmap.scaled(
+                        max_size, max_size, aspectRatioMode=aspect_ratio_mode)
+
+                if pixmap.isNull():
+                    continue
+
+                label.setPixmap(pixmap)
+                self.layout().addWidget(label)
+            else:
+                self.layout().addWidget(label)
 
     def _clear_labels(self):
         while self.layout().count():
@@ -59,6 +81,7 @@ class FileList(QWidget):
 
     def update(self, album_path):
         print("updating file list to look at ", album_path)
+        self.album_path = album_path
         self.file_list = os.listdir(album_path)
         self._update_labels()
 
@@ -74,7 +97,6 @@ class PickADir(QWidget):
         button = QPushButton("Select a Photo Album", parent=self)
         self.setFixedWidth(250)
         button.clicked.connect(self.set_dir)
-
 
     def set_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(
