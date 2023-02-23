@@ -44,10 +44,18 @@ class FileList(QWidget):
         super().__init__(parent)
 
         self.file_list = ["file 1", "file 2"]
+
         layout = QVBoxLayout()
         self.setLayout(layout)
 
         self.album_path = None
+
+        ##########
+        # todo delete
+        self.album_path = "/home/theo/Projects/photo_namer_tool/test_album"
+        self.update(self.album_path)
+        ##########
+
 
         self._update_labels()
 
