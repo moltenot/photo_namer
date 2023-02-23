@@ -3,7 +3,7 @@ import os
 from os.path import join
 
 from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QPainter
 from PyQt6.QtCore import Qt
 
 
@@ -71,37 +71,37 @@ class FileList(QWidget):
         ##########
         # todo delete
         self.album_path = "/home/theo/Projects/photo_namer_tool/test_album"
-        # self.update(self.album_path)
+        self.update(self.album_path)
         ##########
 
 
-        # self._update_labels()
+        self._update_labels()
 
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
         for f in self.file_list:
-            label = QLabel(self)
+            label = QLabel()
             label.setText(f)
+
             if self.album_path:
                 pixmap = QPixmap(join(self.album_path, f))
                 # scale pixmap if it is too large
                 max_size = 300
                 if pixmap.width() > max_size or pixmap.height() > max_size:
                     pixmap = pixmap.scaled(
-                        max_size, max_size, aspectRatioMode=aspect_ratio_mode)
+                            max_size, max_size, aspectRatioMode=aspect_ratio_mode, transformMode=Qt.TransformationMode.SmoothTransformation)
 
                 if pixmap.isNull():
                     continue
 
                 label.setPixmap(pixmap)
-                self.scroll_widget_layout.addWidget(label)
-            else:
-                self.scroll_widget_layout.addWidget(label)
+
+            self.vbox.addWidget(label)
 
     def _clear_labels(self):
-        while self.layout().count():
-            child = self.layout().takeAt(0)
+        while self.vbox.count():
+            child = self.vbox.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
