@@ -21,7 +21,7 @@ class PhotoNamer(QMainWindow):
 
         self.file_list = FileList(self)
 
-        layout = QHBoxLayout()
+        layout = QVBoxLayout()
         layout.addWidget(PickADir(self, self.set_album_path))
         layout.addWidget(self.file_list)
 
@@ -119,10 +119,12 @@ class PickADir(QWidget):
     def __init__(self, parent, on_pick_album_callback):
         super().__init__(parent)
         self.on_pick_album_callback = on_pick_album_callback
-
-        button = QPushButton("Select a Photo Album", parent=self)
-        self.setFixedWidth(250)
+        self.layout = QVBoxLayout()
+        button = QPushButton("Select a Photo Album")
         button.clicked.connect(self.set_dir)
+
+        self.layout.addWidget(button)
+        self.setLayout(self.layout)
 
     def set_dir(self):
         self.dir = str(QFileDialog.getExistingDirectory(
