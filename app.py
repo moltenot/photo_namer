@@ -2,11 +2,10 @@ import sys
 import os
 from os.path import join
 
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea, QInputDialog
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt
-
-
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
 
@@ -35,7 +34,25 @@ class PhotoNamer(QMainWindow):
         self.file_list.update(path)
 
 
+class ClickableLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def mousePressEvent(self, event):
+        self.clicked.emit()
+
+
 class EditableImage(QWidget):
+
+    def showInputDialog(self):
+        text, ok = QInputDialog.getText(
+            self, 'Input Dialog', 'Enter the filename you want for this image:')
+        if ok:
+            print(f'set filename to, {text}!')
+            self.label_label.setText(f"{text.replace(' ', '_')}.{self.label_label.text().split('.')[-1]}")
+
+    def mousePressEvent(self, event):
+        # get input from the user
+        self.showInputDialog()
 
     def __init__(self, image_path):
         super().__init__()
@@ -77,9 +94,11 @@ class FileList(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.scroll = QScrollArea() # Scroll Area which contains the widgets, set as the centralWidget
-        self.widget = QWidget() # Widget that contains the collection of Vertical Box
-        self.vbox = QVBoxLayout() # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+        # Scroll Area which contains the widgets, set as the centralWidget
+        self.scroll = QScrollArea()
+        self.widget = QWidget()  # Widget that contains the collection of Vertical Box
+        # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+        self.vbox = QVBoxLayout()
 
         for i in range(1, 50):
             object = QLabel("TextLabel")
@@ -88,8 +107,10 @@ class FileList(QWidget):
         self.widget.setLayout(self.vbox)
 
         # Scroll Area Properties
-        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.widget)
 
