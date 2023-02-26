@@ -1,8 +1,9 @@
+from PyQt6.QtWidgets import QInputDialog, QLineEdit
 import sys
 import os
 from os.path import join
 
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea, QInputDialog
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea, QInputDialog, QDialog
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtCore import pyqtSignal
@@ -41,14 +42,65 @@ class ClickableLabel(QLabel):
         self.clicked.emit()
 
 
+class CustomInputDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # create a custom line edit
+        self.lineEdit = CustomLineEdit()
+
+        # create buttons
+        okButton = QPushButton("OK")
+        cancelButton = QPushButton("Cancel")
+
+        # create a layout for the buttons
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(cancelButton)
+
+        # create a layout for the label and line edit
+        inputLayout = QVBoxLayout()
+        inputLayout.addWidget(QLabel("Enter text:"))
+        inputLayout.addWidget(self.lineEdit)
+        inputLayout.addLayout(buttonLayout)
+
+        self.setLayout(inputLayout)
+
+        # set up connections
+        okButton.clicked.connect(self.accept)
+        cancelButton.clicked.connect(self.reject)
+
+    def getText(self, label):
+        self.setWindowTitle(label)
+        if self.exec() == QDialog.DialogCode.Accepted:
+            print("accepted")
+            return self.lineEdit.text(), True
+        else:
+            print("not accepted")
+            print(self.exec_())
+            return None, False
+
+
+class CustomLineEdit(QLineEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.textChanged.connect(self.modifyText)
+
+    def modifyText(self, text):
+        text = text.replace(' ', '_')
+        self.setText(text)
+
+
 class EditableImage(QWidget):
 
     def showInputDialog(self):
-        text, ok = QInputDialog.getText(
-            self, 'Input Dialog', 'Enter the filename you want for this image:')
+        text, ok = CustomInputDialog(self).getText("Enter the title of the image")
+
         if ok:
             print(f'set filename to, {text}!')
-            self.label_label.setText(f"{text.replace(' ', '_')}.{self.label_label.text().split('.')[-1]}")
+            self.label_label.setText(
+                f"{text.replace(' ', '_')}.{self.label_label.text().split('.')[-1]}")
 
     def mousePressEvent(self, event):
         # get input from the user
