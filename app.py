@@ -100,17 +100,20 @@ class EditableImage(QWidget):
         if ok:
             print(f'set filename to, {text}!')
             self.label_label.setText(
-                f"{text.replace(' ', '_')}.{self.label_label.text().split('.')[-1]}")
+                f"{self.number_in_dir:02d}_{text.replace(' ', '_')}.{self.suffix}")
 
     def mousePressEvent(self, event):
         # get input from the user
         self.showInputDialog()
 
-    def __init__(self, image_path):
+    def __init__(self, image_path, number_in_dir):
         super().__init__()
 
         self.image_path = image_path
         self.filename = os.path.basename(image_path)
+        self.number_in_dir = number_in_dir
+        self.old_filename = os.path.basename(image_path)
+        self.suffix = self.old_filename.split(".")[-1]
         self.layout = QVBoxLayout()
 
         self.image_label = QLabel(self.image_path)
@@ -180,11 +183,13 @@ class FileList(QWidget):
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
+        count = 1
         for f in self.file_list:
             if self.album_path:
                 image_path = join(self.album_path, f)
                 try:
-                    image_label = EditableImage(image_path)
+                    image_label = EditableImage(image_path, count)
+                    count += 1
                 except Exception:
                     continue
 
