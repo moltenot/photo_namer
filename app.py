@@ -93,14 +93,17 @@ class CustomLineEdit(QLineEdit):
 
 
 class EditableImage(QWidget):
+    old_filename:str
+    new_filename:str
 
     def showInputDialog(self):
         text, ok = CustomInputDialog(self).getText("Enter the title of the image")
 
         if ok:
-            print(f'set filename to, {text}!')
-            self.label_label.setText(
-                f"{self.number_in_dir:02d}_{text.replace(' ', '_')}.{self.suffix}")
+            self.new_filename = f"{self.number_in_dir:02d}_{text.replace(' ', '_')}.{self.suffix}"
+            print(f'new filename: {self.new_filename}')
+            self.label_label.setText(self.new_filename)
+                
 
     def mousePressEvent(self, event):
         # get input from the user
