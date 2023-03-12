@@ -75,19 +75,24 @@ class CustomLineEdit(QLineEdit):
 class EditableImage(QWidget):
     old_filename: str
     new_filename: str
+    num_digits: int # the number of digits needed to identify this image in the folder
 
     def showInputDialog(self):
         text, ok = CustomInputDialog(self).getText(
             "Enter the title of the image")
 
         if ok:
-            self.new_filename = f"{self.number_in_dir:02d}_{text.replace(' ', '_')}.{self.suffix}"
+            self.new_filename = f"{self.number_in_dir:0{self.num_digits}d}_{text.replace(' ', '_')}.{self.suffix}"
             print(f'new filename: {self.new_filename}')
             self.label_label.setText(self.new_filename)
 
     def mousePressEvent(self, event):
         # get input from the user
         self.showInputDialog()
+
+    def set_num_digits(self, num_digits):
+        """set the number of digits needed to represent this file. i.e. 3 digits if their are 100+ images in the directory"""
+        self.num_digits = num_digits
 
     def __init__(self, image_path, number_in_dir):
         super().__init__()
@@ -194,6 +199,8 @@ class FileList(QWidget):
 
         num_images = len(self.editable_images)
         self.num_digits = len(str(num_images))
+        for ei in self.editable_images:
+            ei.set_num_digits(self.num_digits)
         print(f"cached {num_images} images, which is {self.num_digits} digits")
 
     def _update_labels(self):
@@ -217,7 +224,7 @@ class FileList(QWidget):
             if widget is not None:
                 widget.deleteLater()
 
-    def update(self, album_path):
+    def updateAlbumPath(self, album_path):
         print("updating file list to look at ", album_path)
         self.album_path = album_path
         self.remove_widgets()
@@ -261,7 +268,7 @@ class PhotoNamer(QMainWindow):
     def set_album_path(self, path):
         print("setting album path to", path)
         self.album_path = path
-        self.file_list.update(path)
+        self.file_list.updateAlbumPath(path)
 
 
 if __name__ == "__main__":
