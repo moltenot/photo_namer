@@ -55,7 +55,8 @@ class CustomInputDialog(QDialog):
             return self.lineEdit.text(), True
         else:
             print("not accepted")
-            print(self.exec_())
+            print(self.exec())
+            self.deleteLater()
             return None, False
 
 
@@ -172,7 +173,7 @@ class FileList(QWidget):
 
         self._update_labels()
 
-    def cache_images(self):
+    def _cache_images(self):
         """takes the images in the given directory, and create EditableImage widgets from them"""
         print(f"caching images in {self.album_path}")
 
@@ -194,7 +195,6 @@ class FileList(QWidget):
 
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
-        self._clear_labels()
         for i, ei in enumerate(self.editable_images):
             print("number of columns", self.num_columns)
             self.grid.addWidget(ei, i // self.num_columns, i % self.num_columns)
@@ -207,8 +207,13 @@ class FileList(QWidget):
         print("updating file list to look at ", album_path)
         self.album_path = album_path
         self.file_list = os.listdir(album_path)
-        self.cache_images()
+        self.parent().setMinimumSize(600, 600)
+        self._clear_labels()
+        self._cache_images()
         self._update_labels()
+        self.num_columns = 3
+        print("parent", self.parentWidget())
+        self.parentWidget().adjustSize()
 
     def resizeEvent(self, event):
         """this is automatically called on resize (it overrides the parent)"""
