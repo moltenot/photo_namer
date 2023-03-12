@@ -140,13 +140,11 @@ class PickADir(QWidget):
 class FileList(QWidget):
     column_width = 150
     num_columns = 3
-    file_list: list[str]
+    file_list = []
     album_path: str
 
     def __init__(self, parent):
         super().__init__(parent)
-
-        self.file_list = ["file 1", "file 2"]
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -155,13 +153,9 @@ class FileList(QWidget):
         self.scroll = QScrollArea()
         self.widget = QWidget()  # Widget that contains the collection of Vertical Box
         # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
-        self.vbox = QGridLayout()
+        self.grid = QGridLayout()
 
-        for i in range(1, 50):
-            object = QLabel("TextLabel")
-            self.vbox.addWidget(object)
-
-        self.widget.setLayout(self.vbox)
+        self.widget.setLayout(self.grid)
 
         # Scroll Area Properties
         self.scroll.setVerticalScrollBarPolicy(
@@ -174,13 +168,13 @@ class FileList(QWidget):
         self.layout.addWidget(self.scroll)
         self.album_path = None
 
+        self._update_labels()
+
         ##########
         # todo delete
         self.album_path = "/home/theo/Projects/photo_namer_tool/test_album"
         self.update(self.album_path)
         ##########
-
-        self._update_labels()
 
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
@@ -192,14 +186,14 @@ class FileList(QWidget):
                 try:
                     image_label = EditableImage(image_path, count)
                     count += 1
+                    self.grid.addWidget(image_label, i // self.num_columns, i % self.num_columns)
                 except Exception:
                     continue
 
-            self.vbox.addWidget(image_label, i // self.num_columns, i % self.num_columns)
 
     def _clear_labels(self):
-        while self.vbox.count():
-            child = self.vbox.takeAt(0)
+        while self.grid.count():
+            child = self.grid.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
@@ -208,6 +202,15 @@ class FileList(QWidget):
         self.album_path = album_path
         self.file_list = os.listdir(album_path)
         self._update_labels()
+
+    def resizeEvent(self, event):
+        """this is automatically called on resize (it overrides the parent)"""
+        # Update the number of columns based on the width of the window
+        columns = event.size().width() // self.column_width
+        if columns != self.num_columns:
+            print(f"updating number of columns from {self.num_columns} to {columns}")
+            self.num_columns = columns
+            self._update_labels()
 
 
 class PhotoNamer(QMainWindow):
