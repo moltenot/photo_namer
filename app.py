@@ -1,12 +1,12 @@
-from PyQt6.QtWidgets import QInputDialog, QLineEdit, QGridLayout
+from PyQt6.QtWidgets import QLineEdit, QGridLayout
 import sys
 import os
 from os.path import join
 
 from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, \
-    QVBoxLayout, QScrollArea, QInputDialog, QDialog
+    QVBoxLayout, QScrollArea, QDialog
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt
 from PyQt6.QtCore import pyqtSignal
 
 aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
@@ -56,8 +56,6 @@ class CustomInputDialog(QDialog):
             return self.lineEdit.text(), True
         else:
             print("not accepted")
-            print(self.exec())
-            self.deleteLater()
             return None, False
 
 
@@ -75,11 +73,14 @@ class CustomLineEdit(QLineEdit):
 class EditableImage(QWidget):
     old_filename: str
     new_filename: str
-    num_digits: int # the number of digits needed to identify this image in the folder
+    num_digits: int  # the number of digits needed to identify this image in the folder
 
     def showInputDialog(self):
+        print("showing input dialog")
         text, ok = CustomInputDialog(self).getText(
             "Enter the title of the image")
+
+        print(f"get text closed, received {text} {ok}")
 
         if ok:
             self.new_filename = f"{self.number_in_dir:0{self.num_digits}d}_{text.replace(' ', '_')}.{self.suffix}"
@@ -91,7 +92,7 @@ class EditableImage(QWidget):
         self.showInputDialog()
 
     def set_num_digits(self, num_digits):
-        """set the number of digits needed to represent this file. i.e. 3 digits if their are 100+ images in the directory"""
+        """set the number of digits needed to represent this file. i.e. 3 digits if there are 100+ images in the directory"""
         self.num_digits = num_digits
 
     def __init__(self, image_path, number_in_dir):
@@ -210,13 +211,12 @@ class FileList(QWidget):
             self.grid.addWidget(ei, i // self.num_columns, i % self.num_columns)
 
     def _clear_labels(self):
-        """clear the labels from the grid layout so they can be added again (potentially in a new configuration)"""
+        """clear the labels from the grid layout, so they can be added again (potentially in a new configuration)"""
         for ei in self.editable_images:
             self.grid.removeWidget(ei)
 
-
     def remove_widgets(self):
-        """remove all traces of editibale images, so you can look at a new folder as a photo album"""
+        """remove all traces of editable images, so you can look at a new folder as a photo album"""
         self.editable_images = []
         while self.grid.count():
             item = self.grid.takeAt(0)
