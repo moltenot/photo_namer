@@ -1,12 +1,14 @@
-from PyQt6.QtWidgets import QInputDialog, QLineEdit
+from PyQt6.QtWidgets import QInputDialog, QLineEdit, QGridLayout
 import sys
 import os
 from os.path import join
 
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, QVBoxLayout, QScrollArea, QInputDialog, QDialog
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, \
+    QVBoxLayout, QScrollArea, QInputDialog, QDialog
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtCore import pyqtSignal
+
 aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
 
@@ -104,7 +106,8 @@ class EditableImage(QWidget):
         max_size = 300
         if pixmap.width() > max_size or pixmap.height() > max_size:
             pixmap = pixmap.scaled(
-                max_size, max_size, aspectRatioMode=aspect_ratio_mode, transformMode=Qt.TransformationMode.SmoothTransformation)
+                max_size, max_size, aspectRatioMode=aspect_ratio_mode,
+                transformMode=Qt.TransformationMode.SmoothTransformation)
 
         if pixmap.isNull():
             raise Exception("not an image")
@@ -135,7 +138,8 @@ class PickADir(QWidget):
 
 
 class FileList(QWidget):
-
+    column_width = 150
+    num_columns = 3
     file_list: list[str]
     album_path: str
 
@@ -151,7 +155,7 @@ class FileList(QWidget):
         self.scroll = QScrollArea()
         self.widget = QWidget()  # Widget that contains the collection of Vertical Box
         # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
-        self.vbox = QVBoxLayout()
+        self.vbox = QGridLayout()
 
         for i in range(1, 50):
             object = QLabel("TextLabel")
@@ -182,7 +186,7 @@ class FileList(QWidget):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
         count = 1
-        for f in self.file_list:
+        for i, f in enumerate(self.file_list):
             if self.album_path:
                 image_path = join(self.album_path, f)
                 try:
@@ -191,7 +195,7 @@ class FileList(QWidget):
                 except Exception:
                     continue
 
-            self.vbox.addWidget(image_label)
+            self.vbox.addWidget(image_label, i // self.num_columns, i % self.num_columns)
 
     def _clear_labels(self):
         while self.vbox.count():
