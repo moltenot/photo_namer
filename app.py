@@ -1,13 +1,14 @@
-from PyQt6.QtWidgets import QLineEdit, QGridLayout
-import sys
 import os
+import shutil
+import sys
 from os.path import join
 
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, \
-    QVBoxLayout, QScrollArea, QDialog
-from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QFileDialog, QPushButton, QMainWindow, QHBoxLayout, \
+    QVBoxLayout, QScrollArea, QDialog
+from PyQt6.QtWidgets import QLineEdit, QGridLayout
 
 aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
@@ -72,7 +73,7 @@ class CustomLineEdit(QLineEdit):
 
 class EditableImage(QWidget):
     old_filename: str
-    new_filename: str
+    new_filename = None  # set to string when you know it
     num_digits: int  # the number of digits needed to identify this image in the folder
 
     def showInputDialog(self):
@@ -179,13 +180,26 @@ class FileList(QWidget):
         self.album_path = None
 
         self.parent().setMinimumSize(600, 600)
-        self.pick_a_dir = PickADir(self, self.updateAlbumPath)
-        self.write_changes = QPushButton("Write new filenames")
-        self.write_changes.clicked.connect(self.write_filename_changes)
+        self.pick_a_dir = PickADir(self, self.update_album_path)
         self.layout.addWidget(self.pick_a_dir)
 
     def write_filename_changes(self):
         print("write filename changes")
+        print(self.album_path)
+        for ei in self.editable_images:
+            print(ei.old_filename)
+            if ei.new_filename:
+                print(f"has a new filename of {ei.new_filename}")
+                # shutil.move(join(self.album_path, ei.old_filename), join(self.album_path, ei.new_filename))
+            else:
+                print("doesn't have a new filename")
+
+        # set the UI back
+        self.write_button.deleteLater()
+        self.pick_a_dir = PickADir(self, self.update_album_path)
+        self.layout.addWidget(self.pick_a_dir)
+        self.remove_widgets()
+        self.file_list = []
 
     def _cache_images(self):
         """takes the images in the given directory, and create EditableImage widgets from them"""
@@ -231,7 +245,7 @@ class FileList(QWidget):
             if widget is not None:
                 widget.deleteLater()
 
-    def updateAlbumPath(self, album_path):
+    def update_album_path(self, album_path):
         print("updating file list to look at ", album_path)
         self.album_path = album_path
         self.remove_widgets()
@@ -242,8 +256,11 @@ class FileList(QWidget):
         self.num_columns = 3
 
         # change the bottom buttons from the "pick a dir" button to the write changes button
-        self.layout.removeWidget(self.pick_a_dir)
-        self.layout.addWidget(self.write_changes)
+        # self.layout.removeWidget(self.pick_a_dir)
+        self.pick_a_dir.deleteLater()
+        self.write_button = QPushButton("Write new filenames")
+        self.write_button.clicked.connect(self.write_filename_changes)
+        self.layout.addWidget(self.write_button)
 
     def resizeEvent(self, event):
         """this is automatically called on resize (it overrides the parent)"""
@@ -276,7 +293,7 @@ class PhotoNamer(QMainWindow):
     def set_album_path(self, path):
         print("setting album path to", path)
         self.album_path = path
-        self.file_list.updateAlbumPath(path)
+        self.file_list.update_album_path(path)
 
 
 if __name__ == "__main__":
