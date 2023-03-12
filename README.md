@@ -3,7 +3,7 @@ Photo Namer
 
 The idea of this tool is to get rid of image imports that look like this:
 
-```shell
+```
 test_album/
 ├── 20230219_0002_01.jpg
 ├── 20230219_0003.jpg
@@ -16,7 +16,7 @@ test_album/
 
 In favour of semantically meaningful names, but maintaining the order of the files on the album so that they are still readable and make sense as a sequence
 
-```shell
+```
 test_album/
 ├── 01_this_thing.jpg
 ├── 02_another_thing.jpg
