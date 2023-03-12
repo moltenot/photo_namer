@@ -10,31 +10,6 @@ from PyQt6.QtCore import pyqtSignal
 aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
 
-class PhotoNamer(QMainWindow):
-    album_path: str
-
-    def __init__(self):
-        super().__init__(parent=None)
-        self.setWindowTitle("Photo Namer")
-
-        everything_widget = QWidget(self)
-
-        self.file_list = FileList(self)
-
-        layout = QVBoxLayout()
-        layout.addWidget(PickADir(self, self.set_album_path))
-        layout.addWidget(self.file_list)
-
-        everything_widget.setLayout(layout)
-
-        self.setCentralWidget(everything_widget)
-
-    def set_album_path(self, path):
-        print("setting album path to", path)
-        self.album_path = path
-        self.file_list.update(path)
-
-
 class ClickableLabel(QLabel):
     clicked = pyqtSignal()
 
@@ -93,17 +68,17 @@ class CustomLineEdit(QLineEdit):
 
 
 class EditableImage(QWidget):
-    old_filename:str
-    new_filename:str
+    old_filename: str
+    new_filename: str
 
     def showInputDialog(self):
-        text, ok = CustomInputDialog(self).getText("Enter the title of the image")
+        text, ok = CustomInputDialog(self).getText(
+            "Enter the title of the image")
 
         if ok:
             self.new_filename = f"{self.number_in_dir:02d}_{text.replace(' ', '_')}.{self.suffix}"
             print(f'new filename: {self.new_filename}')
             self.label_label.setText(self.new_filename)
-                
 
     def mousePressEvent(self, event):
         # get input from the user
@@ -137,6 +112,26 @@ class EditableImage(QWidget):
         self.image_label.setPixmap(pixmap)
 
         self.setLayout(self.layout)
+
+
+class PickADir(QWidget):
+    files: list[str]
+    dir: str
+
+    def __init__(self, parent, on_pick_album_callback):
+        super().__init__(parent)
+        self.on_pick_album_callback = on_pick_album_callback
+        self.layout = QVBoxLayout()
+        button = QPushButton("Select a Photo Album")
+        button.clicked.connect(self.set_dir)
+
+        self.layout.addWidget(button)
+        self.setLayout(self.layout)
+
+    def set_dir(self):
+        self.dir = str(QFileDialog.getExistingDirectory(
+            self, "Select a Directory"))
+        self.on_pick_album_callback(self.dir)
 
 
 class FileList(QWidget):
@@ -211,24 +206,29 @@ class FileList(QWidget):
         self._update_labels()
 
 
-class PickADir(QWidget):
-    files: list[str]
-    dir: str
+class PhotoNamer(QMainWindow):
+    album_path: str
 
-    def __init__(self, parent, on_pick_album_callback):
-        super().__init__(parent)
-        self.on_pick_album_callback = on_pick_album_callback
-        self.layout = QVBoxLayout()
-        button = QPushButton("Select a Photo Album")
-        button.clicked.connect(self.set_dir)
+    def __init__(self):
+        super().__init__(parent=None)
+        self.setWindowTitle("Photo Namer")
 
-        self.layout.addWidget(button)
-        self.setLayout(self.layout)
+        everything_widget = QWidget(self)
 
-    def set_dir(self):
-        self.dir = str(QFileDialog.getExistingDirectory(
-            self, "Select a Directory"))
-        self.on_pick_album_callback(self.dir)
+        self.file_list = FileList(self)
+
+        layout = QVBoxLayout()
+        layout.addWidget(PickADir(self, self.set_album_path))
+        layout.addWidget(self.file_list)
+
+        everything_widget.setLayout(layout)
+
+        self.setCentralWidget(everything_widget)
+
+    def set_album_path(self, path):
+        print("setting album path to", path)
+        self.album_path = path
+        self.file_list.update(path)
 
 
 if __name__ == "__main__":
