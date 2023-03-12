@@ -14,7 +14,7 @@ test_album/
 └── 20230219_0029.jpg
 ```
 
-In favour of semantically meaningful names, but maintaining the order of the files in the album so that they are still readable and make sense as a sequence
+In favour of semantically meaningful names, but maintaining the order of the files on the album so that they are still readable and make sense as a sequence
 
 ```shell
 test_album/
@@ -26,3 +26,13 @@ test_album/
 ├── 06_dog.jpg
 └── 07_cat.jpg
 ```
+
+## Developing
+
+The project uses PyQT6, and all the code to run the app is in the file [app.py](app.py). To run the app simply call
+
+```shell
+venv/bin/python app.py
+```
+
+after all the requirements from the requirements.txt have been installed to a python virtual environment at venv.

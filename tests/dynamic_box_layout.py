@@ -1,3 +1,6 @@
+"""Testing a layout where a QGrid is dynamically updated to have the appropriate number of columns for the width of
+it's container
+"""
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QGridLayout, QPushButton
 from PyQt6.QtCore import QSize, Qt
 
