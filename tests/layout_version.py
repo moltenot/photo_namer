@@ -1,90 +1,47 @@
 """written by ChatGPT when asked to convert dynamic_box_layout to a QLayout"""
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QLayout, QWidget, QPushButton, QVBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QGridLayout, QWidget, QVBoxLayout, QPushButton
 
 
-class ResizableGridLayout(QLayout):
-    column_width = 150
-    num_columns = 3
-
+class ResizableGridLayout(QGridLayout):
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.grid = QGridLayout()
+        self.column_width = 150
+        self.num_columns = 3
         self.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.addLayout(self.grid)
+        self.add_widgets()
 
-        self.widgets = []
-
-    def addItem(self, item):
-        pass
-
-    def addWidget(self, widget):
-        self.widgets.append(widget)
-        self.updateWidgets()
-
-    def count(self):
-        return len(self.widgets)
-
-    def itemAt(self, index):
-        if index < 0 or index >= len(self.widgets):
-            return None
-        return self.widgets[index]
-
-    def takeAt(self, index):
-        if index < 0 or index >= len(self.widgets):
-            return None
-        return self.widgets.pop(index)
-
-    def sizeHint(self):
-        return QSize(self.num_columns * self.column_width, 200)
-
-    def setGeometry(self, rect):
-        super().setGeometry(rect)
-        self.updateWidgets()
-
-    def updateWidgets(self):
-        while self.grid.count():
-            item = self.grid.takeAt(0)
+    def remove_widgets(self):
+        while self.count():
+            item = self.takeAt(0)
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
 
-        for i, widget in enumerate(self.widgets):
-            row = i // self.num_columns
-            col = i % self.num_columns
-            self.grid.addWidget(widget, row, col)
+    def add_widgets(self):
+        self.remove_widgets()
+        for i in range(20):
+            btn = QPushButton(f'Button {i}')
+            self.addWidget(btn, i // self.num_columns, i % self.num_columns)
 
-    def updateNumColumns(self):
-        width = self.geometry().width()
-        columns = width // self.column_width
+    def resizeEvent(self, event):
+        columns = event.size().width() // self.column_width
         if columns != self.num_columns:
             self.num_columns = columns
-            self.updateWidgets()
+            self.add_widgets()
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-
         self.setWindowTitle('Resizable Layout Example')
+        self.setMinimumSize(QSize(450, 200))
 
-        self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
+        self.vbox = QVBoxLayout()
+        self.setLayout(self.vbox)
 
-        self.grid_layout = ResizableGridLayout()
-        self.layout.addLayout(self.grid_layout)
-
-        self.add_widgets()
-
-    def add_widgets(self):
-        for i in range(20):
-            btn = QPushButton(f'Button {i}')
-            self.grid_layout.addWidget(btn)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.grid_layout.updateNumColumns()
+        self.grid = ResizableGridLayout()
+        self.vbox.addLayout(self.grid)
 
 
 if __name__ == '__main__':
