@@ -178,7 +178,14 @@ class FileList(QWidget):
         self.layout.addWidget(self.scroll)
         self.album_path = None
 
-        self._update_labels()
+        self.parent().setMinimumSize(600, 600)
+        self.pick_a_dir = PickADir(self, self.updateAlbumPath)
+        self.write_changes = QPushButton("Write new filenames")
+        self.write_changes.clicked.connect(self.write_filename_changes)
+        self.layout.addWidget(self.pick_a_dir)
+
+    def write_filename_changes(self):
+        print("write filename changes")
 
     def _cache_images(self):
         """takes the images in the given directory, and create EditableImage widgets from them"""
@@ -229,11 +236,14 @@ class FileList(QWidget):
         self.album_path = album_path
         self.remove_widgets()
         self.file_list = os.listdir(album_path)
-        self.parent().setMinimumSize(600, 600)
         self._clear_labels()
         self._cache_images()
         self._update_labels()
         self.num_columns = 3
+
+        # change the bottom buttons from the "pick a dir" button to the write changes button
+        self.layout.removeWidget(self.pick_a_dir)
+        self.layout.addWidget(self.write_changes)
 
     def resizeEvent(self, event):
         """this is automatically called on resize (it overrides the parent)"""
@@ -258,9 +268,7 @@ class PhotoNamer(QMainWindow):
         self.file_list = FileList(self)
 
         layout = QVBoxLayout()
-        layout.addWidget(PickADir(self, self.set_album_path))
         layout.addWidget(self.file_list)
-
         everything_widget.setLayout(layout)
 
         self.setCentralWidget(everything_widget)
