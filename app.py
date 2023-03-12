@@ -138,7 +138,7 @@ class PickADir(QWidget):
 
 
 class FileList(QWidget):
-    column_width = 150
+    column_width = 300
     num_columns = 3
     file_list = []  # file names
     editable_images = []  # editable image widgets
@@ -185,6 +185,7 @@ class FileList(QWidget):
                 image_label = EditableImage(image_path, count)
                 count += 1
                 self.editable_images.append(image_label)
+                print(f"cached {f}")
             except Exception:
                 continue
 
@@ -194,6 +195,7 @@ class FileList(QWidget):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
         for i, ei in enumerate(self.editable_images):
+            print("number of columns", self.num_columns)
             self.grid.addWidget(ei, i // self.num_columns, i % self.num_columns)
 
     def _clear_labels(self):
@@ -210,7 +212,8 @@ class FileList(QWidget):
     def resizeEvent(self, event):
         """this is automatically called on resize (it overrides the parent)"""
         # Update the number of columns based on the width of the window
-        columns = event.size().width() // self.column_width
+        min_columns = 1
+        columns = max(event.size().width() // self.column_width, min_columns)
         if columns != self.num_columns:
             print(f"updating number of columns from {self.num_columns} to {columns}")
             self.num_columns = columns
