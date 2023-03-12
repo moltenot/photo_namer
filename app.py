@@ -13,6 +13,7 @@ aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
 IMAGE_WIDTH = 200
 
+
 class ClickableLabel(QLabel):
     clicked = pyqtSignal()
 
@@ -191,7 +192,9 @@ class FileList(QWidget):
             except Exception:
                 continue
 
-        print("done caching images")
+        num_images = len(self.editable_images)
+        self.num_digits = len(str(num_images))
+        print(f"cached {num_images} images, which is {self.num_digits} digits")
 
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
@@ -200,20 +203,30 @@ class FileList(QWidget):
             self.grid.addWidget(ei, i // self.num_columns, i % self.num_columns)
 
     def _clear_labels(self):
+        """clear the labels from the grid layout so they can be added again (potentially in a new configuration)"""
         for ei in self.editable_images:
             self.grid.removeWidget(ei)
+
+
+    def remove_widgets(self):
+        """remove all traces of editibale images, so you can look at a new folder as a photo album"""
+        self.editable_images = []
+        while self.grid.count():
+            item = self.grid.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
 
     def update(self, album_path):
         print("updating file list to look at ", album_path)
         self.album_path = album_path
+        self.remove_widgets()
         self.file_list = os.listdir(album_path)
         self.parent().setMinimumSize(600, 600)
         self._clear_labels()
         self._cache_images()
         self._update_labels()
         self.num_columns = 3
-        print("parent", self.parentWidget())
-        self.parentWidget().adjustSize()
 
     def resizeEvent(self, event):
         """this is automatically called on resize (it overrides the parent)"""
