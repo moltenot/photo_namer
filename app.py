@@ -11,6 +11,7 @@ from PyQt6.QtCore import pyqtSignal
 
 aspect_ratio_mode = Qt.AspectRatioMode.KeepAspectRatio
 
+IMAGE_WIDTH = 200
 
 class ClickableLabel(QLabel):
     clicked = pyqtSignal()
@@ -103,7 +104,7 @@ class EditableImage(QWidget):
 
         pixmap = QPixmap(self.image_path)
         # scale pixmap if it is too large
-        max_size = 300
+        max_size = IMAGE_WIDTH
         if pixmap.width() > max_size or pixmap.height() > max_size:
             pixmap = pixmap.scaled(
                 max_size, max_size, aspectRatioMode=aspect_ratio_mode,
@@ -138,7 +139,7 @@ class PickADir(QWidget):
 
 
 class FileList(QWidget):
-    column_width = 300
+    column_width = IMAGE_WIDTH
     num_columns = 3
     file_list = []  # file names
     editable_images = []  # editable image widgets
