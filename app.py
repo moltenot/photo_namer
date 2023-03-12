@@ -170,12 +170,6 @@ class FileList(QWidget):
 
         self._update_labels()
 
-        ##########
-        # todo delete
-        self.album_path = "/home/theo/Projects/photo_namer_tool/test_album"
-        self.update(self.album_path)
-        ##########
-
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
