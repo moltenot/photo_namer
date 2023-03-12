@@ -245,7 +245,7 @@ class FileList(QWidget):
         print("updating file list to look at ", album_path)
         self.album_path = album_path
         self.remove_widgets()
-        self.file_list = os.listdir(album_path)
+        self.file_list = sorted(os.listdir(album_path))
         self._clear_labels()
         self._cache_images()
         self._update_labels()
