@@ -30,25 +30,25 @@ class CustomInputDialog(QDialog):
         self.lineEdit = CustomLineEdit()
 
         # create buttons
-        okButton = QPushButton("OK")
-        cancelButton = QPushButton("Cancel")
+        ok_button = QPushButton("OK")
+        cancel_button = QPushButton("Cancel")
 
         # create a layout for the buttons
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(okButton)
-        buttonLayout.addWidget(cancelButton)
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(ok_button)
+        button_layout.addWidget(cancel_button)
 
         # create a layout for the label and line edit
-        inputLayout = QVBoxLayout()
-        inputLayout.addWidget(QLabel("Enter text:"))
-        inputLayout.addWidget(self.lineEdit)
-        inputLayout.addLayout(buttonLayout)
+        input_layout = QVBoxLayout()
+        input_layout.addWidget(QLabel("Enter text:"))
+        input_layout.addWidget(self.lineEdit)
+        input_layout.addLayout(button_layout)
 
-        self.setLayout(inputLayout)
+        self.setLayout(input_layout)
 
         # set up connections
-        okButton.clicked.connect(self.accept)
-        cancelButton.clicked.connect(self.reject)
+        ok_button.clicked.connect(self.accept)
+        cancel_button.clicked.connect(self.reject)
 
     def getText(self, label):
         self.setWindowTitle(label)
@@ -93,7 +93,8 @@ class EditableImage(QWidget):
         self.showInputDialog()
 
     def set_num_digits(self, num_digits):
-        """set the number of digits needed to represent this file. i.e. 3 digits if there are 100+ images in the directory"""
+        """set the number of digits needed to represent this file.
+        i.e. 3 digits if there are 100+ images in the directory"""
         self.num_digits = num_digits
 
     def __init__(self, image_path, number_in_dir):
