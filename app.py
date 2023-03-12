@@ -140,7 +140,8 @@ class PickADir(QWidget):
 class FileList(QWidget):
     column_width = 150
     num_columns = 3
-    file_list = []
+    file_list = []  # file names
+    editable_images = []  # editable image widgets
     album_path: str
 
     def __init__(self, parent):
@@ -170,31 +171,40 @@ class FileList(QWidget):
 
         self._update_labels()
 
+    def cache_images(self):
+        """takes the images in the given directory, and create EditableImage widgets from them"""
+        print(f"caching images in {self.album_path}")
+
+        if not self.album_path:
+            return
+
+        count = 1
+        for f in self.file_list:
+            image_path = join(self.album_path, f)
+            try:
+                image_label = EditableImage(image_path, count)
+                count += 1
+                self.editable_images.append(image_label)
+            except Exception:
+                continue
+
+        print("done caching images")
+
     def _update_labels(self):
         """update the labels on this widget from the self.file_list attribute """
         self._clear_labels()
-        count = 1
-        for i, f in enumerate(self.file_list):
-            if self.album_path:
-                image_path = join(self.album_path, f)
-                try:
-                    image_label = EditableImage(image_path, count)
-                    count += 1
-                    self.grid.addWidget(image_label, i // self.num_columns, i % self.num_columns)
-                except Exception:
-                    continue
-
+        for i, ei in enumerate(self.editable_images):
+            self.grid.addWidget(ei, i // self.num_columns, i % self.num_columns)
 
     def _clear_labels(self):
-        while self.grid.count():
-            child = self.grid.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
+        for ei in self.editable_images:
+            self.grid.removeWidget(ei)
 
     def update(self, album_path):
         print("updating file list to look at ", album_path)
         self.album_path = album_path
         self.file_list = os.listdir(album_path)
+        self.cache_images()
         self._update_labels()
 
     def resizeEvent(self, event):
