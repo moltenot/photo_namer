@@ -1,9 +1,8 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QLabel
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import QSize, Qt
 
 
 class MainWindow(QWidget):
-
     column_width = 150
     num_columns = 3
 
@@ -18,6 +17,7 @@ class MainWindow(QWidget):
 
         self.grid = QGridLayout()
         self.vbox.addLayout(self.grid)
+        self.grid.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.add_widgets()
 
@@ -25,7 +25,7 @@ class MainWindow(QWidget):
         while self.grid.count():
             item = self.grid.takeAt(0)
             widget = item.widget()
-            if widget is not  None:
+            if widget is not None:
                 widget.deleteLater()
 
     def add_widgets(self):
