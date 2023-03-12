@@ -187,12 +187,8 @@ class FileList(QWidget):
         print("write filename changes")
         print(self.album_path)
         for ei in self.editable_images:
-            print(ei.old_filename)
             if ei.new_filename:
-                print(f"has a new filename of {ei.new_filename}")
-                # shutil.move(join(self.album_path, ei.old_filename), join(self.album_path, ei.new_filename))
-            else:
-                print("doesn't have a new filename")
+                shutil.move(join(self.album_path, ei.old_filename), join(self.album_path, ei.new_filename))
 
         # set the UI back
         self.write_button.deleteLater()
