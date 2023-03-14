@@ -243,6 +243,12 @@ class FileList(QWidget):
                 widget.deleteLater()
 
     def update_album_path(self, album_path):
+
+        # return if album_path is not a valid path
+        if not os.path.isdir(album_path):
+            print(f"invalid album path: {album_path}")
+            return
+
         print("updating file list to look at ", album_path)
         self.album_path = album_path
         self.remove_widgets()
